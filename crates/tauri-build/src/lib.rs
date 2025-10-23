@@ -613,6 +613,7 @@ pub fn try_build(attributes: Attributes) -> Result<()> {
           .bundle
           .icon
           .iter()
+          .flatten()
           .find(|i| i.ends_with(".ico"))
           .map(AsRef::as_ref)
           .unwrap_or("icons/icon.ico")
@@ -724,6 +725,18 @@ fn to_winres_version(v: &semver::Version) -> u64 {
   let build = v.build.parse::<u16>().map(u64::from).unwrap_or(0);
 
   (v.major << 48) | (v.minor << 32) | (v.patch << 16) | build
+}
+
+fn find_icon<F: Fn(&&String) -> bool>(config: &Config, predicate: F, default: &str) -> PathBuf {
+  let icon_path = match &config.bundle.icon {
+    None => default.to_string(),
+    Some(icons) => icons
+      .iter()
+      .find(|i| predicate(i))
+      .cloned()
+      .unwrap_or_else(|| default.to_string()),
+  };
+  icon_path.into()
 }
 
 #[cfg(test)]

@@ -595,6 +595,7 @@ pub fn try_build(attributes: Attributes) -> Result<()> {
           .bundle
           .icon
           .iter()
+          .flatten()
           .find(|i| i.ends_with(".ico"))
           .map(AsRef::as_ref)
           .unwrap_or("icons/icon.ico")
